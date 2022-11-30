@@ -1,40 +1,24 @@
-version: 1
+version: 0.1
+backend:
+  phases:
+    build:
+      commands:
+        - chmod 600 .ssh/basecamp_pkgs .ssh/basecamp_pkgs.pub
+        - eval $(ssh-agent -s)
+        - ssh-add .ssh/basecamp_pkgs
+        - update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.8 11
+        - /usr/local/bin/pip3.8 install --user pipenv==2022.9.21
+        - amplifyPush --Simple
 frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - export NODE_OPTIONS=--max-old-space-size=8500
+        - npm install
     build:
       commands:
         - npm run build
   artifacts:
     baseDirectory: build
     files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-test:
-  phases:
-    preTest:
-      commands:
-        - echo "==test start==========="
-        - npm ci
-        - npm install wait-on
-        - npm install pm2
-        - npm install mocha mochawesome mochawesome-merge mochawesome-report-generator
-        - npx pm2 start npm -- start
-        - 'npx wait-on --timeout 60 http://localhost:3000'
-    test:
-      commands:
-        - 'npx cypress run --reporter mochawesome --reporter-options "reportDir=cypress/report/mochawesome-report,overwrite=false,html=false,json=true,timestamp=mmddyyyy_HHMMss"'
-    postTest:
-      commands:
-        - npx mochawesome-merge cypress/report/mochawesome-report/mochawesome*.json > cypress/report/mochawesome.json
-        - npx pm2 kill
-  artifacts:
-    baseDirectory: cypress
-    configFilePath: '**/mochawesome.json'
-    files:
-      - '**/*.png'
-      - '**/*.mp4'
+      - "**/*"
