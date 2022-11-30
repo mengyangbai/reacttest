@@ -3,9 +3,6 @@ backend:
   phases:
     build:
       commands:
-        - chmod 600 .ssh/basecamp_pkgs .ssh/basecamp_pkgs.pub
-        - eval $(ssh-agent -s)
-        - ssh-add .ssh/basecamp_pkgs
         - update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.8 11
         - /usr/local/bin/pip3.8 install --user pipenv==2022.9.21
         - amplifyPush --Simple
